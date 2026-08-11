@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#124b35"><title>Friendly Competition Alpha 0.7.3</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--g:#124b35;--g2:#2e7654;--pale:#e8f1e9;--bg:#f3f5f0;--ink:#183126;--muted:#758079;--line:#e0e6df;--red:#bd403b;--blue:#2f67aa}
+*{box-sizing:border-box}body{margin:0;background:#e7ece7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+.app{max-width:480px;margin:auto;min-height:100vh;background:var(--bg);padding-bottom:84px}
+header{position:sticky;top:0;z-index:10;background:linear-gradient(#124b35,#103e2e);color:#fff;padding:14px 14px 11px}.brand{font-weight:900;font-size:18px}.tiny{font-size:11px;opacity:.7}
+.tabs{display:flex;gap:7px;overflow:auto;margin-top:11px}.tabs button{border:0;border-radius:18px;padding:8px 11px;background:#ffffff18;color:white;font-weight:800;white-space:nowrap}.tabs .on{background:white;color:var(--g)}
+main{padding:12px}.card{background:#fff;border-radius:17px;padding:14px;margin-bottom:11px;box-shadow:0 3px 14px #1731260d}.hero{background:linear-gradient(135deg,#174f39,#2f7655);color:#fff}.title{font-weight:900;font-size:17px}.muted{color:var(--muted);font-size:12px}.hero .muted{color:#ffffffb0}
+.row{display:flex;gap:9px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}.grow{flex:1}.me{background:#edf5ee;margin:0 -8px;padding:10px 8px;border-radius:11px}
+.btn{border:0;border-radius:12px;padding:12px;font-weight:900;font-size:14px}.primary{width:100%;background:var(--g2);color:#fff}.soft{background:#edf2ed;color:var(--g)}.danger{background:#f5e9e8;color:#8c302c}
+.bottom{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:auto;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:20}.bottom button{border:0;background:none;color:#6e7972;font-size:10px;min-width:58px}.bottom .on{color:var(--g);font-weight:900}.bottom .scoreNav{background:var(--g2);color:white;border-radius:50%;width:45px;height:45px;margin-top:-20px;font-size:18px}
+.segment{display:flex;background:#edf1ed;border-radius:10px;padding:3px}.segment button{border:0;background:none;border-radius:8px;padding:6px 9px;font-size:11px;font-weight:900;color:#66736b}.segment .on{background:#fff;color:var(--g);box-shadow:0 1px 5px #0001}
+.headline{display:flex;align-items:center;gap:8px}.headline .segment{margin-left:auto}.chip{display:inline-block;padding:4px 7px;border-radius:10px;background:#edf2ed;color:var(--g);font-size:10px;font-weight:900}
+.guide{height:128px;border-radius:14px;background:linear-gradient(145deg,#c7dec0,#edf0d5);position:relative;overflow:hidden;margin:10px 0}.fair{position:absolute;left:50%;top:-25px;transform:translateX(-50%) rotate(7deg);height:185px;width:85px;border-radius:45%;background:#78a96f}.green{position:absolute;right:75px;top:15px;width:38px;height:28px;border-radius:50%;background:#4d8b4a}.sand{position:absolute;right:55px;top:44px;width:22px;height:13px;border-radius:50%;background:#dfc89b}.water{position:absolute;left:22px;bottom:15px;width:65px;height:25px;border-radius:50%;background:#79a7c6}.guideTag{position:absolute;left:9px;top:8px;background:#ffffffe8;border-radius:9px;padding:5px 7px;font-weight:900;font-size:11px;z-index:2}
+.player{padding:11px 0;border-bottom:1px solid var(--line)}.player:last-child{border:0}.phead{display:flex;align-items:center;gap:8px}.phead b{flex:1}.liveScore{font-size:15px;font-weight:900}.scroller{display:flex;gap:7px;overflow-x:auto;padding:8px 2px 4px}.scroller button{min-width:46px;height:45px;border:1px solid #d6ddd6;background:#fff;border-radius:12px;font-size:16px;font-weight:900}.scroller .parBtn{border:2px solid var(--g2);position:relative}.scroller .parBtn:after{content:"PAR";position:absolute;bottom:2px;left:0;right:0;font-size:7px;color:var(--g2)}.scroller .sel{background:var(--g);color:#fff;border-color:var(--g)}
+.notice{padding:10px;border-radius:11px;background:#f4ead8;font-size:12px}.ok{background:#e5f1e7;color:var(--g)}.warn{background:#fff3da;border:1px solid #ead49b;border-radius:12px;padding:10px;font-size:12px}
+.tablewrap{overflow:auto}.scoretable{border-collapse:collapse;min-width:900px;width:100%;font-size:11px}.scoretable th,.scoretable td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:center}.scoretable th:first-child,.scoretable td:first-child{position:sticky;left:0;background:white;z-index:2;text-align:left}.sum{background:#f1f3ef!important;font-weight:900}
+.mark{position:relative;display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;font-weight:900;color:var(--ink)}
+.mark:before,.mark:after{content:"";position:absolute;pointer-events:none}
+.bird:before,.eagle:before,.albatross:before{inset:3px;border:2px solid #2f8a55;border-radius:50%}
+.eagle:after,.albatross:after{inset:0;border:2px solid #2f8a55;border-radius:50%}
+.albatross{outline:2px solid #2f8a55;outline-offset:3px;border-radius:50%}
+.bogey:before,.double:before,.triple:before{inset:3px;border:2px solid #c34b47}
+.double:after,.triple:after{inset:0;border:2px solid #c34b47}
+.triple{outline:2px solid #c34b47;outline-offset:3px}
+.pop{display:none;position:fixed;z-index:50;left:50%;top:14%;transform:translateX(-50%);width:min(420px,90vw);background:white;border-radius:18px;padding:18px;box-shadow:0 20px 65px #0005}.pop.show{display:block}.pop input,.pop select{width:100%;padding:11px;border:1px solid #d9dfd8;border-radius:10px;font-size:16px;margin:6px 0}.check{display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:start;padding:10px 0}.unitInput{display:flex;align-items:center;border:1px solid #d9dfd8;border-radius:10px;overflow:hidden;margin:6px 0}.unitInput input{border:0!important;margin:0!important}.unitInput span{padding:0 12px;font-weight:900;color:var(--g)}
+.status{display:inline-flex;gap:6px;align-items:center;font-size:11px;font-weight:800}.dot{width:8px;height:8px;border-radius:50%;background:#aaa}.dot.live{background:#35a765}
+.linkrow{cursor:pointer;touch-action:manipulation}
+.infoBtn{border:0;background:#e9efea;color:var(--g);width:21px;height:21px;border-radius:50%;font-weight:900;padding:0}
+.next{border:1px solid #cfe0d2;background:#edf6ee}.kicker{font-size:10px;font-weight:900;letter-spacing:.08em;color:var(--g2)}
+.roundstatus{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:#f3f6f2;border-radius:11px;padding:9px}.stat b{display:block;font-size:16px}
+.overlay{display:none;position:fixed;inset:0;z-index:60;background:#0004;padding:14vh 18px}.overlay.show{display:block}.modal{max-width:420px;margin:auto;background:#fff;border-radius:18px;padding:18px;box-shadow:0 20px 65px #0005}
+</style></head>
+<body><div class="app"><header><div class="brand">🪙⛳ Friendly Competition</div><div class="tiny">Alpha 0.7.3 · Round Polish</div><div class="tabs" id="tabs"></div></header><main id="main"></main><div class="bottom" id="bottom"></div></div><div class="pop" id="pop"></div><div class="overlay" id="overlay" onclick="if(event.target===this)closeInfo()"><div class="modal" id="infoModal"></div></div>
+<script>
+const SUPABASE_URL="https://nbwgcqwpfzpirfrmxnkz.supabase.co";
+const SUPABASE_KEY="sb_publishable_-frwAW-liQlS_aftG5Xv-Q_lmG3ng6X";
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const H=[[1,4,12,328],[2,5,8,467],[3,4,4,366],[4,4,14,330],[5,3,6,149],[6,4,10,280],[7,3,2,148],[8,5,16,407],[9,4,18,250],[10,4,9,345],[11,4,13,320],[12,4,7,334],[13,3,1,165],[14,5,15,505],[15,4,5,365],[16,4,3,340],[17,3,17,99],[18,4,11,357]];
+const side={7:{kind:"nearest",name:"Närmast hål",pre:"Hoppas järnet är varmt! Nu är det dags för närmast hål!"},16:{kind:"longest",name:"Longest Drive",pre:"Damma av drivern! Nu är det dags för Longest Drive!"}};
+let state={competition:null,players:[],scores:[],side:[],me:null,page:"home",sub:"today",metric:"points",openPlayer:null,connected:false};
+let token=localStorage.fc07_token||crypto.randomUUID();localStorage.fc07_token=token;
+let joinCode=new URLSearchParams(location.search).get("game")||localStorage.fc07_game||"";
+let channel=null;
+
+function hc(p,hi){let c=p.course_handicap,idx=H[hi][2];if(c>=0)return Math.floor(c/18)+(c%18>=idx?1:0);let give=-c;return idx>=19-give?-1:0}
+function scoreFor(pid,h){let x=state.scores.find(s=>s.player_id===pid&&s.hole===h);return x?x.strokes:null}
+function net(p,hi){let s=scoreFor(p.id,hi+1);return s==null?null:s-hc(p,hi)}
+function sp(p,hi){let n=net(p,hi);if(n==null)return null;let d=n-H[hi][1];return d<=-3?5:d===-2?4:d===-1?3:d===0?2:d===1?1:0}
+function points(p,through=18){let x=0;for(let h=0;h<through;h++)x+=sp(p,h)||0;return x}
+function netToPar(p,through=18){let x=0;for(let h=0;h<through;h++){let n=net(p,h);if(n!=null)x+=n-H[h][1]}return x}
+function fmt(x){return x===0?"E":x>0?`+${x}`:`${x}`}
+function holesPlayed(p){return state.scores.filter(s=>s.player_id===p.id).length}
+function joined(){return state.players.filter(p=>p.claimed_token).length}
+function ranking(){return [...state.players].sort((a,b)=>state.metric==="points"?(points(b)-points(a)||a.hcp-b.hcp):(netToPar(a)-netToPar(b)||a.hcp-b.hcp))}
+function val(p){return state.metric==="points"?`${points(p)} p`:fmt(netToPar(p))}
+function sideResult(h){return state.side.find(x=>x.hole===h&&x.kind===side[h]?.kind)}
+function allScored(h){return state.players.every(p=>scoreFor(p.id,h)!=null)}
+function hcpLabel(p,i){let x=hc(p,i);return x<0?`+${Math.abs(x)}`:`${x}`}
+function birdies(p){return H.filter((x,i)=>{let s=scoreFor(p.id,i+1);return s!=null&&s<x[1]}).length}
+function bogeys(p){return H.filter((x,i)=>{let s=scoreFor(p.id,i+1);return s!=null&&s>x[1]}).length}
+function remainingSides(){return Object.keys(side).filter(h=>!sideResult(+h)).length}
+function info(title,body){infoModal.innerHTML=`<div class="title">${title}</div><p>${body}</p>`;overlay.classList.add("show")}
+function closeInfo(){overlay.classList.remove("show")}
+function sideInfo(h){let e=side[h];info(e.name,e.kind==="nearest"?"Bollen måste ligga på green för att räknas. Kortast avstånd till hålet vinner. Resultatet kan fyllas i även efter avslutad rond.":"Bollen måste ligga på fairway för att räknas. Längsta godkända drive vinner. Resultatet kan fyllas i även efter avslutad rond.")}
+function nextStep(){if(!state.competition)return"";if(state.competition.status==="finished")return `<div class="card next"><div class="kicker">NÄSTA STEG</div><div class="title">Ronden är avslutad</div><p class="muted">${remainingSides()?remainingSides()+" sidotävling(ar) saknar resultat.":"Alla resultat är registrerade."}</p><button class="btn primary" onclick="state.page='results';state.sub='final';render()">Visa resultat</button></div>`;if(state.competition.status==="active")return `<div class="card next"><div class="kicker">NÄSTA STEG</div><div class="title">Fortsätt hål ${state.competition.current_hole}</div><button class="btn primary" onclick="state.page='score';state.sub='register';render()">Fortsätt rond</button></div>`;return""}
+function roundStatus(){if(!state.me||!state.competition||state.competition.status!=="active")return"";return `<div class="card"><div class="title">Din rondstatus</div><div class="roundstatus"><div class="stat"><span class="muted">Hål</span><b>${state.competition.current_hole}/18</b></div><div class="stat"><span class="muted">Resultat</span><b>${points(state.me)} p · ${fmt(netToPar(state.me))}</b></div><div class="stat"><span class="muted">Tagna / tappade</span><b>◯ ${birdies(state.me)} · □ ${bogeys(state.me)}</b></div><div class="stat"><span class="muted">Sidotävlingar kvar</span><b>${remainingSides()}</b></div></div></div>`}
+
+
+async function reload(){
+ if(!joinCode){render();return}
+ let {data:c}=await sb.from("competitions").select("*").eq("join_code",joinCode).maybeSingle();if(!c){render();return}
+ state.competition=c;
+ let [{data:p},{data:s},{data:sr}]=await Promise.all([
+  sb.from("players").select("*").eq("competition_id",c.id).order("sort_order"),
+  sb.from("scores").select("*").eq("competition_id",c.id),
+  sb.from("side_results").select("*").eq("competition_id",c.id)
+ ]);
+ state.players=p||[];state.scores=s||[];state.side=sr||[];
+ state.me=state.players.find(p=>p.id===localStorage.fc07_player)||null;
+ subscribe();render();
+}
+function subscribe(){
+ if(!state.competition)return;if(channel)sb.removeChannel(channel);
+ channel=sb.channel("fc-"+state.competition.id)
+ .on("postgres_changes",{event:"*",schema:"public",table:"scores",filter:`competition_id=eq.${state.competition.id}`},reload)
+ .on("postgres_changes",{event:"*",schema:"public",table:"side_results",filter:`competition_id=eq.${state.competition.id}`},reload)
+ .on("postgres_changes",{event:"UPDATE",schema:"public",table:"players",filter:`competition_id=eq.${state.competition.id}`},reload)
+ .on("postgres_changes",{event:"UPDATE",schema:"public",table:"competitions",filter:`id=eq.${state.competition.id}`},reload)
+ .subscribe(x=>{state.connected=x==="SUBSCRIBED";render()});
+}
+async function createTest(){let {data,error}=await sb.rpc("alpha_create_test_competition");if(error)return alert(error.message);let code=Array.isArray(data)?data[0]?.join_code:data?.join_code;joinCode=code;localStorage.fc07_game=code;history.replaceState(null,"",`?game=${code}`);await reload()}
+async function claim(id){let {data}=await sb.rpc("alpha_claim_player",{p_join_code:joinCode,p_player_id:id,p_token:token});if(!data)return alert("Spelaren är redan vald på en annan telefon.");localStorage.fc07_player=id;await reload()}
+async function logout(){if(state.me)await sb.rpc("alpha_release_player",{p_join_code:joinCode,p_player_id:state.me.id,p_token:token});localStorage.removeItem("fc07_player");state.me=null;await reload()}
+async function setScore(pid,h,strokes){if(!state.me)return;let {data,error}=await sb.rpc("alpha_set_score",{p_join_code:joinCode,p_actor_token:token,p_player_id:pid,p_hole:h,p_strokes:strokes});if(error||!data)alert("Scoren kunde inte sparas.")}
+async function startCompetition(){if(!state.me)return;if(joined()<2)return alert("Minst två spelare behöver vara inne i appen.");await sb.rpc("alpha_set_current_hole",{p_join_code:joinCode,p_actor_token:token,p_hole:1});toast("⛳ Välkommen!","Här är dagens upplägg. Nu kör vi!")}
+async function confirmHole(){let h=state.competition.current_hole;if(!allScored(h))return;if(h===18){await sb.rpc("alpha_finish_competition",{p_join_code:joinCode,p_actor_token:token});await reload();let m=remainingSides();pop.innerHTML=`<div class="title">🏁 Ronden är klar!</div><p>Alla scorer är sparade.</p>${m?`<div class="warn">⚠ ${m} sidotävling(ar) saknar resultat.</div>`:""}<button class="btn primary" style="margin-top:10px" onclick="pop.classList.remove('show');state.page='results';state.sub='final';render()">Visa resultat</button>`;pop.classList.add("show");return}
+ await sb.rpc("alpha_set_current_hole",{p_join_code:joinCode,p_actor_token:token,p_hole:h+1});
+ if(side[h])setTimeout(()=>sidePopup(h),150);else if(h===9)setTimeout(halftime,150);else if(side[h+1])setTimeout(()=>headsUp(h+1),150)
+}
+function copyInvite(){let u=location.origin+location.pathname+"?game="+joinCode;navigator.clipboard?.writeText(u);alert("Inbjudningslänken är kopierad.")}
+function newRound(){localStorage.removeItem("fc07_game");localStorage.removeItem("fc07_player");joinCode="";state.competition=null;state.players=[];state.scores=[];state.side=[];state.me=null;state.page="home";state.sub="today";history.replaceState(null,"",location.pathname);render()}
+
+function guide(h){let x=H[h-1];return `<div class="guide"><div class="guideTag">Hål ${x[0]} · Par ${x[1]} · Index ${x[2]} · ${x[3]} m</div><div class="fair"></div><div class="green"></div><div class="sand"></div><div class="water"></div></div>`}
+function seg(){return `<div class="segment"><button class="${state.metric==='strokes'?'on':''}" onclick="state.metric='strokes';render()">SLAG</button><button class="${state.metric==='points'?'on':''}" onclick="state.metric='points';render()">POÄNG</button></div>`}
+function mark(s,p){if(s==null)return"–";let d=s-p,c=d<=-3?"albatross":d===-2?"eagle":d===-1?"bird":d===0?"":d===1?"bogey":d===2?"double":"triple";return `<span class="mark ${c}">${s}</span>`}
+function scoreCard(p){let out=0,inn=0;for(let h=1;h<=9;h++)out+=scoreFor(p.id,h)||0;for(let h=10;h<=18;h++)inn+=scoreFor(p.id,h)||0;
+ return `<div class="tablewrap"><table class="scoretable"><tr><th>Hål</th>${H.slice(0,9).map(x=>`<th>${x[0]}</th>`).join("")}<th class="sum">OUT</th>${H.slice(9).map(x=>`<th>${x[0]}</th>`).join("")}<th class="sum">IN</th><th class="sum">TOT</th></tr>
+ <tr><th>Par</th>${H.slice(0,9).map(x=>`<td>${x[1]}</td>`).join("")}<td class="sum">36</td>${H.slice(9).map(x=>`<td>${x[1]}</td>`).join("")}<td class="sum">35</td><td class="sum">71</td></tr>
+ <tr><th>Index</th>${H.slice(0,9).map(x=>`<td>${x[2]}</td>`).join("")}<td class="sum">–</td>${H.slice(9).map(x=>`<td>${x[2]}</td>`).join("")}<td class="sum">–</td><td class="sum">–</td></tr><tr><th>HCP-slag</th>${H.slice(0,9).map((x,i)=>`<td>${hcpLabel(p,i)}</td>`).join("")}<td class="sum">–</td>${H.slice(9).map((x,i)=>`<td>${hcpLabel(p,i+9)}</td>`).join("")}<td class="sum">–</td><td class="sum">–</td></tr>
+ <tr><th>Score</th>${H.slice(0,9).map(x=>`<td>${mark(scoreFor(p.id,x[0]),x[1])}</td>`).join("")}<td class="sum">${out||"–"}</td>${H.slice(9).map(x=>`<td>${mark(scoreFor(p.id,x[0]),x[1])}</td>`).join("")}<td class="sum">${inn||"–"}</td><td class="sum">${out+inn||"–"}</td></tr>
+ <tr><th>Poäng</th>${H.slice(0,9).map((x,i)=>`<td>${sp(p,i)??"–"}</td>`).join("")}<td class="sum">${H.slice(0,9).reduce((a,x,i)=>a+(sp(p,i)||0),0)}</td>${H.slice(9).map((x,i)=>`<td>${sp(p,i+9)??"–"}</td>`).join("")}<td class="sum">${H.slice(9).reduce((a,x,i)=>a+(sp(p,i+9)||0),0)}</td><td class="sum">${points(p)}</td></tr></table></div>`}
+function togglePlayer(id){state.openPlayer=state.openPlayer===id?null:id;render()}
+
+function identity(){return `<div class="card"><div class="title">Vem är du?</div><div class="muted">Ansluten betyder att spelaren är inne i appen.</div>${state.players.map(p=>`<button class="btn ${p.claimed_token?'soft':'primary'}" style="margin-top:8px;width:100%" ${p.claimed_token?'disabled':''} onclick="claim('${p.id}')">${p.name} · HCP ${p.hcp}${p.claimed_token?" · Ansluten":""}</button>`).join("")}</div>`}
+function home(){
+ if(!state.competition)return `<div class="card hero"><div class="title">Friendly Competition</div><p>Skapa en gemensam testrunda.</p></div><button class="btn primary" onclick="createTest()">Skapa testrunda</button>`;
+ let active=state.competition.status==="active",finished=state.competition.status==="finished";
+ if(state.sub==="rules")return `<div class="card"><div class="title">Spelregler</div><div class="row"><span class="grow">Spelform</span><b>Poängbogey</b></div><div class="row"><span class="grow">Tie-break</span><b>Lägst HCP före</b></div><div class="row"><span class="grow">Närmast hål</span><b>Hål 7</b></div><div class="row"><span class="grow">Longest Drive</span><b>Hål 16</b></div></div>`;
+ return `<div class="card hero"><div class="muted">${finished?"AVSLUTAD":active?"PÅGÅENDE ROND":"LOBBY"}</div><div style="font-size:26px;font-weight:900">${state.competition.course_name}</div><div>${active?`Hål ${state.competition.current_hole}`:"Välkommen – här är dagens upplägg!"}</div></div>
+ <div class="card"><div class="row"><span class="grow"><b>Liveanslutning</b></span><span class="status"><span class="dot ${state.connected?'live':''}"></span>${state.connected?"Live":"Ansluter"}</span></div>
+ <div class="row"><span class="grow"><b>Inne i appen</b></span><b>${joined()} / ${state.players.length}</b></div>
+ ${state.players.map(p=>`<div class="row"><span class="grow"><b>${p.name}</b><div class="muted">HCP ${p.hcp} · ${p.tee} tee</div></span><span class="chip">${p.claimed_token?"Ansluten":"Väntar"}</span></div>`).join("")}</div>
+ ${!state.me?identity():`<div class="card"><b>Du är ${state.me.name}</b><div class="muted">Alla spelare kan fortfarande få score registrerad även om de inte är inne i appen.</div><button class="btn soft" style="margin-top:8px" onclick="logout()">Logga ut / byt spelare</button></div>`}
+ <div class="card"><div class="title">Dagens upplägg</div><div class="row"><span class="grow">Poängbogey</span><b>18 hål</b></div><div class="row"><span class="grow">🎯 Närmast hål</span><b>Hål 7</b></div><div class="row"><span class="grow">💥 Longest Drive</span><b>Hål 16</b></div><button class="btn primary" onclick="copyInvite()">🔗 Kopiera inbjudningslänk</button></div>
+ ${!active&&!finished&&state.me?`<div class="${joined()>=2?'notice ok':'warn'}"><b>${joined()>=2?"Redo att starta":"Väntar på minst en spelare till"}</b></div><button class="btn primary" style="margin-top:10px" ${joined()<2?'disabled style="opacity:.45;margin-top:10px"':''} onclick="startCompetition()">Starta tävling</button>`:""}
+ ${active?nextStep()+roundStatus()+guide(state.competition.current_hole):""}
+ ${finished?`<button class="btn primary" onclick="state.page='results';state.sub='final';render()">Visa slutresultat</button><button class="btn soft" style="width:100%;margin-top:8px" onclick="newRound()">Ny rond</button>`:""}`;
+}
+function scorePage(){
+ if(!state.me)return identity();
+ if(state.sub==="card"){let ord=ranking();return `<div class="card"><div class="headline"><div><div class="title">Scorekort</div><div class="muted">Tryck på en spelare. Scorekortet finns även innan score registrerats.</div></div>${seg()}</div>${ord.map(p=>`<div><div class="row linkrow ${state.me.id===p.id?'me':''}" onclick="togglePlayer('${p.id}')"><span class="grow"><b>${p.name}</b>${state.me.id===p.id?' <span class="chip">DU</span>':''}</span><b>${val(p)}</b><span>⌄</span></div>${state.openPlayer===p.id?scoreCard(p):""}</div>`).join("")}</div>`}
+ let h=state.competition.current_hole,hd=H[h-1];
+ return `${guide(h)}<div class="card"><div class="title">Registrera score</div><div class="muted">Par är markerat. Ovanligare resultat anges med +.</div>${state.players.map(p=>{let cur=scoreFor(p.id,h);return `<div class="player"><div class="phead"><b>${p.name}</b><span class="liveScore">${fmt(netToPar(p,h-1))} · ${points(p,h-1)} p</span>${state.me.id===p.id?'<span class="chip">DU</span>':''}</div><div class="scroller">${Array.from({length:hd[1]+5},(_,i)=>i+1).map(n=>`<button class="${n===hd[1]?'parBtn':''} ${cur===n?'sel':''}" onclick="setScore('${p.id}',${h},${n})">${n}</button>`).join("")}<button onclick="manual('${p.id}',${h})">＋</button></div></div>`}).join("")}</div>
+ ${allScored(h)?`<div class="notice ok"><b>✓ Alla spelare registrerade</b><br>Snabbkolla innan du går vidare.</div><button class="btn primary" style="margin-top:8px" onclick="confirmHole()">Bekräfta hål ${h} →</button>`:`<button class="btn primary" disabled style="opacity:.45">Fyll i alla spelare</button>`}`;
+}
+function manual(pid,h){let v=prompt("Ange score");if(v&&!isNaN(v)&&+v>0)setScore(pid,h,+v)}
+function livePage(){let ord=ranking();return `<div class="card"><div class="headline"><div><div class="title">${state.sub==="ball"?"Bollens resultat":"Live leaderboard"}</div><div class="muted">Synkas i realtid mellan telefonerna.</div></div>${seg()}</div>${ord.map((p,i)=>`<div><div class="row linkrow ${state.me&&state.me.id===p.id?'me':''}" onclick="togglePlayer('${p.id}')"><b>${i+1}</b><span class="grow"><b>${p.name}</b>${state.me&&state.me.id===p.id?' <span class="chip">DU</span>':''}<div class="muted">${holesPlayed(p)}/18 hål</div></span><b>${val(p)}</b></div>${state.openPlayer===p.id?scoreCard(p):""}</div>`).join("")}</div>`}
+function resultsPage(){
+ let ord=ranking();
+ if(state.sub==="side")return `<div class="card"><div class="title">Sidotävlingar</div><div class="muted">Kan kompletteras och ändras även efter avslutad rond.</div>${Object.entries(side).map(([h,e])=>{let r=sideResult(+h);return `<div class="row linkrow" onclick="sidePopup(${h})"><span class="grow"><b>${e.name} <button class="infoBtn" onclick="event.stopPropagation();sideInfo(${h})">i</button></b><div class="muted">Hål ${h} · ${r?"Tryck för att ändra":"Ej registrerad"}</div></span><b>${!r?"⚠ Saknas":r.no_winner?"Ingen vinnare":state.players.find(p=>p.id===r.player_id)?.name+(r.distance_m!=null?` · ${String(r.distance_m).replace(".",",")} m`:"")}</b></div>`}).join("")}</div>`;
+ return `<div class="card hero"><div class="muted">${state.competition.status==="finished"?"SLUTRESULTAT":"AKTUELL STÄLLNING"}</div><div style="font-size:27px;font-weight:900">Resultat</div></div><div class="card"><div class="headline"><div class="title">Ställning</div>${seg()}</div>${ord.map((p,i)=>`<div><div class="row linkrow ${state.me&&state.me.id===p.id?'me':''}" onclick="togglePlayer('${p.id}')"><span style="font-size:22px">${["🥇","🥈","🥉","4"][i]||"•"}</span><span class="grow"><b>${p.name}</b></span><b>${val(p)}</b><span>⌄</span></div>${state.openPlayer===p.id?scoreCard(p):""}</div>`).join("")}</div>`;
+}
+function morePage(){return `<div class="card"><div class="title">Mina tävlingar</div><div class="muted">Den här tävlingen kan återöppnas via sin länk.</div></div>${state.competition&&state.competition.status==="active"?`<div class="card"><div class="title">Rondhantering</div><div class="muted">Här avslutar du hela ronden om den inte kan slutföras.</div><button class="btn danger" style="width:100%;margin-top:10px" onclick="abortWhole()">Avsluta hela ronden</button></div>`:""}<div class="card"><div class="row"><span class="grow">Tourställning</span><b>Kommer i Tour-läge</b></div></div>`}
+async function abortWhole(){if(!confirm("Avsluta hela ronden i förtid? Registrerade scorer sparas."))return;await sb.rpc("alpha_finish_competition",{p_join_code:joinCode,p_actor_token:token});await reload();state.page="results";state.sub="final";render()}
+
+function headsUp(h){toast((side[h].kind==="nearest"?"🎯 ":"💥 ")+side[h].name,side[h].pre)}
+function toast(t,txt){pop.innerHTML=`<div class="title">${t}</div><p>${txt}</p><button class="btn primary" onclick="pop.classList.remove('show')">Fortsätt</button>`;pop.classList.add("show")}
+function halftime(){let ord=ranking();pop.innerHTML=`<div class="title">⛳ Halvtid – 9 hål</div><p class="muted">Så här ser läget ut just nu.</p>${ord.map((p,i)=>`<div class="row ${state.me&&state.me.id===p.id?'me':''}"><b>${i+1}</b><span class="grow">${p.name}</span><b>${val(p)}</b></div>`).join("")}<div class="segment" style="margin:10px 0"><button class="${state.metric==='strokes'?'on':''}" onclick="state.metric='strokes';halftime()">SLAG</button><button class="${state.metric==='points'?'on':''}" onclick="state.metric='points';halftime()">POÄNG</button></div><button class="btn primary" onclick="pop.classList.remove('show')">Fortsätt till hål 10 →</button>`;pop.classList.add("show")}
+function sidePopup(h){let e=side[h],r=sideResult(h)||{};pop.innerHTML=`<div class="title">${e.kind==="nearest"?"🎯":"💥"} ${e.name}</div><p><b>Vem vann?</b></p><select id="sidePlayer"><option value="">Välj spelare</option>${state.players.map(p=>`<option value="${p.id}" ${r.player_id===p.id?'selected':''}>${p.name}</option>`).join("")}</select><label class="muted">Avstånd (valfritt)</label><div class="unitInput"><input id="sideDist" inputmode="decimal" value="${r.distance_m??""}" placeholder="t.ex. 1,42"><span>m</span></div><label class="check"><input id="noWinner" type="checkbox" ${r.no_winner?'checked':''}><span><b>Ingen vinnare</b><br><span class="muted">Markera om sidotävlingen avslutades utan vinnare.</span></span></label><button class="btn primary" onclick="saveSide(${h})">Spara & fortsätt</button><button class="btn soft" style="width:100%;margin-top:7px" onclick="pop.classList.remove('show')">Fyll i senare</button>`;pop.classList.add("show")}
+async function saveSide(h){let none=noWinner.checked,pid=sidePlayer.value||null,raw=sideDist.value.trim(),dist=raw?+raw.replace(",","."):null;if(!none&&!pid)return alert("Välj vinnare, Ingen vinnare eller fyll i senare.");let {data,error}=await sb.rpc("alpha_set_side_result",{p_join_code:joinCode,p_actor_token:token,p_hole:h,p_kind:side[h].kind,p_player_id:pid,p_distance_m:dist,p_no_winner:none});if(error||!data)return alert("Kunde inte spara sidotävlingen.");pop.classList.remove("show")}
+
+function tabsRender(){
+ let a=state.page==="home"?[["today","Dagens upplägg"],["rules","Spelregler"]]:state.page==="score"?[["register","Registrera"],["card","Scorekort"]]:state.page==="live"?[["leader","Leaderboard"],["ball","Boll"]]:state.page==="results"?[["final","Slutresultat"],["side","Sidotävlingar"]]:[["more","Mer"]];
+ if(!a.some(x=>x[0]===state.sub))state.sub=a[0][0];
+ tabs.innerHTML=a.map(x=>`<button class="${state.sub===x[0]?'on':''}" onclick="state.sub='${x[0]}';render()">${x[1]}</button>`).join("")
+}
+function nav(){bottom.innerHTML=[["home","🏆","Tävling"],["live","📊","Live"],["score","⛳","Score"],["results","🥇","Resultat"],["more","•••","Mer"]].map(x=>`<button class="${state.page===x[0]?'on':''} ${x[0]==='score'?'scoreNav':''}" onclick="state.page='${x[0]}';state.sub='';render()">${x[1]}<br>${x[2]}</button>`).join("")}
+function render(){tabsRender();nav();main.innerHTML=state.page==="home"?home():state.page==="score"?scorePage():state.page==="live"?livePage():state.page==="results"?resultsPage():morePage()}
+const main=document.getElementById("main"),bottom=document.getElementById("bottom"),tabs=document.getElementById("tabs"),pop=document.getElementById("pop"),overlay=document.getElementById("overlay"),infoModal=document.getElementById("infoModal");reload();render();
+</script></body></html>
